@@ -7,7 +7,8 @@ Pixel RPG characters created by Sean Browning.
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO; // to access read and write to files
+using System.IO; // to access stream reader and writer
+using System; //
 
 
 #region Assignment Instructions
@@ -64,7 +65,6 @@ public partial class PartyCharacter
     Alright, that’s all you need to get started on the first part of this assignment, here are your functions, good luck and journey well!
 */
 
-
 #endregion
 
 
@@ -72,17 +72,21 @@ public partial class PartyCharacter
 
 static public class AssignmentPart1
 {
+    // path to file where data is saved to
+    static string path = Application.dataPath + Path.DirectorySeparatorChar + "SavedDataFile.txt";
     static public void SavePartyButtonPressed()
     {
+        Debug.Log("Party Saved!");
+
         // where we are saving data to (Done)
-        StreamWriter sw = new StreamWriter(Application.dataPath + Path.DirectorySeparatorChar + "SavedDataFile.txt");
+        StreamWriter sw = new StreamWriter(path);
 
         foreach (PartyCharacter pc in GameContent.partyCharacters)
         {
             // writing data into text file (Done)
             sw.WriteLine(pc.classID + "," + pc.health + "," + pc.mana + "," +
                    pc.strength + "," + pc.agility + "," + pc.wisdom);
-            
+
             // TO DO: save equipment
             //pc.equipment;
         }
@@ -91,17 +95,24 @@ static public class AssignmentPart1
 
     static public void LoadPartyButtonPressed()
     {
+        Debug.Log("Loading Party...");
+        if (File.Exists(path))
+        {
+
+            string line = "";
+            StreamReader sr = new StreamReader(path);
+
+            while ((line = sr.ReadLine()) != null)
+            {
+                Debug.Log(line);
+            }
+        }
 
         //GameContent.partyCharacters.Clear();
 
         GameContent.RefreshUI();
-
-        Debug.Log("Load Party Test");
-
     }
-
 }
-
 
 #endregion
 
@@ -204,6 +215,9 @@ static public class AssignmentPart2
  * 
  * 
  * ... Loading stuff
+ * find the file
+ * instanciate reader
+ * open file
+ * read data line by line
  * 
- * Do something to manage version of save ??? ...
  */
