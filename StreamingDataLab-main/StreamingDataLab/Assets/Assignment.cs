@@ -7,7 +7,7 @@ Pixel RPG characters created by Sean Browning.
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.IO;
+using System.IO; // to access read and write to files
 
 
 #region Assignment Instructions
@@ -52,7 +52,6 @@ public partial class PartyCharacter
 
 }
 
-
 /*
     Access to the on screen party data can be achieved via …..
 
@@ -75,25 +74,19 @@ static public class AssignmentPart1
 {
     static public void SavePartyButtonPressed()
     {
-        //Debug.Log("Start of loop");
+        // where we are saving data to (Done)
+        StreamWriter sw = new StreamWriter(Application.dataPath + Path.DirectorySeparatorChar + "SavedDataFile.txt");
 
         foreach (PartyCharacter pc in GameContent.partyCharacters)
         {
-            Debug.Log("PC class id == " + pc.classID);
-
-            // we are saving!!!
-            // write data into a text file
-
-            Debug.Log(Application.dataPath + Path.DirectorySeparatorChar + "DataSaveFile.txt");
-
-
-           Debug.Log(pc.classID + "," + pc.health + "," + pc.mana + "," + 
-               pc.strength + "," + pc.agility + "," + pc.wisdom);
-
+            // writing data into text file (Done)
+            sw.WriteLine(pc.classID + "," + pc.health + "," + pc.mana + "," +
+                   pc.strength + "," + pc.agility + "," + pc.wisdom);
+            
+            // TO DO: save equipment
             //pc.equipment;
         }
-
-        //Debug.Log("End of loop");
+        sw.Close(); // closes file we are writing to
     }
 
     static public void LoadPartyButtonPressed()
@@ -103,7 +96,7 @@ static public class AssignmentPart1
 
         GameContent.RefreshUI();
 
-        Debug.Log("akjsdhalkjdhkaljshd");
+        Debug.Log("Load Party Test");
 
     }
 
@@ -206,8 +199,8 @@ static public class AssignmentPart2
 
 /*
  * (DONE) Figure out how to format the data
- * Where are we saving the data? - Application.dataPath
- * Write data into a text file
+ * (DONE) Where are we saving the data? - Application.dataPath
+ * (DONE) Write data into a text file
  * 
  * 
  * ... Loading stuff
