@@ -95,7 +95,10 @@ static public class AssignmentPart1
 
     static public void LoadPartyButtonPressed()
     {
+        GameContent.partyCharacters.Clear();
+
         Debug.Log("Loading Party...");
+        
         if (File.Exists(path))
         {
 
@@ -104,11 +107,21 @@ static public class AssignmentPart1
 
             while ((line = sr.ReadLine()) != null)
             {
+                string[] cvs = line.Split(',');
+
+                foreach(string i in cvs)
+                {
+                    Debug.Log(i);
+                }
+
                 Debug.Log(line);
+
+                PartyCharacter pc = new PartyCharacter(int.Parse(cvs[0]), int.Parse(cvs[1]), int.Parse(cvs[2]), 
+                    int.Parse(cvs[3]), int.Parse(cvs[4]), int.Parse(cvs[5]));
+
+                GameContent.partyCharacters.AddLast(pc);
             }
         }
-
-        //GameContent.partyCharacters.Clear();
 
         GameContent.RefreshUI();
     }
