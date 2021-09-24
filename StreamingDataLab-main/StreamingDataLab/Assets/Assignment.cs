@@ -72,6 +72,10 @@ public partial class PartyCharacter
 
 static public class AssignmentPart1
 {
+    // signifiers used to save party character info and equipment info respectively
+    static int PartyCharacterSaveSignifier = 0;
+    static int EquipmentSaveSignifier = 1;
+
     // path to file where data is saved to
     static string path = Application.dataPath + Path.DirectorySeparatorChar + "SavedDataFile.txt";
     static public void SavePartyButtonPressed()
@@ -84,13 +88,17 @@ static public class AssignmentPart1
         foreach (PartyCharacter pc in GameContent.partyCharacters)
         {
             // writing data into text file (Done)
-            sw.WriteLine(pc.classID + "," + pc.health + "," + pc.mana + "," +
+            sw.WriteLine(PartyCharacterSaveSignifier + "," + pc.classID + "," + pc.health + "," + pc.mana + "," +
                    pc.strength + "," + pc.agility + "," + pc.wisdom);
 
             // TO DO: save equipment
-            //pc.equipment;
+            foreach(int equipID in pc.equipment)
+            {
+                //Debug.Log("1," + equip);
+                sw.WriteLine(EquipmentSaveSignifier + "," + equipID);
+            }
         }
-        sw.Close(); // closes file we are writing to
+        sw.Close(); // closes file we are saving to
     }
 
     static public void LoadPartyButtonPressed()
@@ -109,17 +117,26 @@ static public class AssignmentPart1
             {
                 string[] cvs = line.Split(',');
 
-                foreach(string i in cvs)
+                //foreach(string i in cvs)
+                //{
+                //    Debug.Log(i);
+                //}
+                //Debug.Log(line);
+
+                int saveDataSignifier = int.Parse(cvs[0]);
+
+                if(saveDataSignifier == PartyCharacterSaveSignifier)
                 {
-                    Debug.Log(i);
+                    PartyCharacter pc = new PartyCharacter(int.Parse(cvs[1]), int.Parse(cvs[2]), int.Parse(cvs[3]),
+                    int.Parse(cvs[4]), int.Parse(cvs[5]), int.Parse(cvs[6]));
+
+                    GameContent.partyCharacters.AddLast(pc);
                 }
-
-                Debug.Log(line);
-
-                PartyCharacter pc = new PartyCharacter(int.Parse(cvs[0]), int.Parse(cvs[1]), int.Parse(cvs[2]), 
-                    int.Parse(cvs[3]), int.Parse(cvs[4]), int.Parse(cvs[5]));
-
-                GameContent.partyCharacters.AddLast(pc);
+                else if(saveDataSignifier == EquipmentSaveSignifier)
+                {
+                    GameContent.partyCharacters.Last.Value.equipment.AddLast(int.Parse(cvs[1]));
+                }
+                
             }
         }
 
