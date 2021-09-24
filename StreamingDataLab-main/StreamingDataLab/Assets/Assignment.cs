@@ -155,7 +155,7 @@ static public class AssignmentPart1
 //  This will enable the needed UI/function calls for your to proceed with your assignment.
 static public class AssignmentConfiguration
 {
-    public const int PartOfAssignmentThatIsInDevelopment = 1;
+    public const int PartOfAssignmentThatIsInDevelopment = 2;
 }
 
 /*
@@ -204,9 +204,9 @@ static public class AssignmentPart2
     static public List<string> GetListOfPartyNames()
     {
         return new List<string>() {
-            "sample 1",
-            "sample 2",
-            "sample 3"
+            "Team 1",
+            "Team 2",
+            "Team 3"
         };
 
     }
@@ -214,21 +214,23 @@ static public class AssignmentPart2
     static public void LoadPartyDropDownChanged(string selectedName)
     {
         GameContent.RefreshUI();
+        Debug.Log("Saved team Party selected...");
     }
 
     static public void SavePartyButtonPressed()
     {
         GameContent.RefreshUI();
+        Debug.Log("Party Saved!!! :D");
     }
 
     static public void NewPartyButtonPressed()
     {
-
+        Debug.Log("New Party Created!");
     }
 
     static public void DeletePartyButtonPressed()
     {
-
+        Debug.Log("Party Deleted... D':");
     }
 
 }
@@ -245,9 +247,12 @@ static public class AssignmentPart2
  * 
  * 
  * ... Loading stuff
- * find the file
- * instanciate reader
- * open file
- * read data line by line
+ * (DONE) find the file
+ * (DONE) instanciate reader
+ * (DONE) open file
+ * (DONE) read data line by line
+ * 
+ * A2 THINGS TO DO
+ * 
  * 
  */
