@@ -91,7 +91,7 @@ static public class AssignmentPart1
             sw.WriteLine(PartyCharacterSaveSignifier + "," + pc.classID + "," + pc.health + "," + pc.mana + "," +
                    pc.strength + "," + pc.agility + "," + pc.wisdom);
 
-            // TO DO: save equipment
+            // save equipment
             foreach(int equipID in pc.equipment)
             {
                 //Debug.Log("1," + equip);
@@ -193,34 +193,66 @@ Good luck, journey well.
 
 static public class AssignmentPart2
 {
+    public const string PartyMetaFile = "PartyIndicesAndNames.txt";
+    
+    private static LinkedList<PartySaveData> Parties;
+    private static uint lastUsedIndex;
 
     static public void GameStart()
     {
-
         GameContent.RefreshUI();
 
+        LoadPartyMetaData();
     }
 
     static public List<string> GetListOfPartyNames()
     {
-        return new List<string>() {
-            "Team 1",
-            "Team 2",
-            "Team 3"
-        };
+        if (Parties == null)
+        {
+            return new List<string>()
+            {
+                "EMPTY"
+            };
+        }
 
+        List<string> pNames = new List<string>();
+
+        foreach (PartySaveData psd in Parties)
+        {
+            pNames.Add(psd.name);
+        }
+
+
+
+        return pNames;
     }
 
     static public void LoadPartyDropDownChanged(string selectedName)
     {
+        foreach (PartySaveData psd in Parties)
+        {
+            if (selectedName == psd.name)
+            {
+                psd.LoadParty();
+            }
+        }
+
         GameContent.RefreshUI();
-        Debug.Log("Saved team Party selected...");
+        Debug.Log("Loading party: " + selectedName);
     }
 
     static public void SavePartyButtonPressed()
     {
+        lastUsedIndex++;
+
+        PartySaveData p = new PartySaveData(lastUsedIndex, GameContent.GetPartyNameFromInput());
+        Parties.AddLast(p);
+
+        SavePartyMetaData();
+        p.SaveParty();
+
         GameContent.RefreshUI();
-        Debug.Log("Party Saved!!! :D");
+        Debug.Log("SAVED PARTY!");
     }
 
     static public void NewPartyButtonPressed()
@@ -233,14 +265,124 @@ static public class AssignmentPart2
         Debug.Log("Party Deleted... D':");
     }
 
-}
+    static public void SavePartyMetaData()
+    {
+        StreamWriter sw = new StreamWriter(Application.dataPath + Path.DirectorySeparatorChar + PartyMetaFile);
 
+        sw.WriteLine("1," + lastUsedIndex);
+
+        foreach (PartySaveData pData in Parties)
+        {
+            sw.WriteLine("2," + pData.index + "," + pData.name);
+        }
+        sw.Close();
+    }
+    
+    static public void LoadPartyMetaData()
+    {
+        Parties = new LinkedList<PartySaveData>();
+
+        string pathPMF = Application.dataPath + Path.DirectorySeparatorChar + PartyMetaFile;
+
+        if (File.Exists(pathPMF))
+        {
+            string line = "";
+            StreamReader sr = new StreamReader(pathPMF);
+
+            while ((line = sr.ReadLine()) != null)
+            {
+                string[] csv = line.Split(',');
+
+                int saveDataSignifier = int.Parse(csv[0]);
+
+                if (saveDataSignifier == 1)
+                {
+                    lastUsedIndex = uint.Parse(csv[1]);
+                }
+                else if (saveDataSignifier == 2)
+                {
+                    Parties.AddLast(new PartySaveData(uint.Parse(csv[1]), csv[2]));
+                }
+            }
+            sr.Close();
+        }
+    }
+}
 #endregion
 
+class PartySaveData
+{
+    // signifiers used to save party character info and equipment info respectively
+    const int PartyCharacterSaveSignifier = 0;
+    const int EquipmentSaveSignifier = 1;
 
-// THINGS TO DO
+    public uint index;
+    public string name;
+    
+    public PartySaveData(uint index, string name)
+    {
+        this.index = index;
+        this.name = name;
+    }
 
-/*
+    public void SaveParty()
+    {
+        StreamWriter sw = new StreamWriter(Application.dataPath + Path.DirectorySeparatorChar + index + ".txt");
+
+        foreach (PartyCharacter pc in GameContent.partyCharacters)
+        {
+            // writing data into text file (Done)
+            sw.WriteLine(PartyCharacterSaveSignifier + "," + pc.classID + "," + pc.health + "," + pc.mana + "," +
+                   pc.strength + "," + pc.agility + "," + pc.wisdom);
+
+            // save equipment
+            foreach (int equipID in pc.equipment)
+            {
+                sw.WriteLine(EquipmentSaveSignifier + "," + equipID);
+            }
+        }
+        sw.Close(); // closes file we are saving to       
+    }
+
+    public void LoadParty()
+    {
+        Debug.Log("Loading Party...");
+        string path = Application.dataPath + Path.DirectorySeparatorChar + index + ".txt";
+
+        if (File.Exists(path))
+        {
+            GameContent.partyCharacters.Clear();
+
+            string line = "";
+            StreamReader sr = new StreamReader(path);
+
+            while ((line = sr.ReadLine()) != null)
+            {
+                string[] cvs = line.Split(',');
+
+                int saveDataSignifier = int.Parse(cvs[0]);
+
+                if (saveDataSignifier == PartyCharacterSaveSignifier)
+                {
+                    PartyCharacter pc = new PartyCharacter(int.Parse(cvs[1]), int.Parse(cvs[2]), int.Parse(cvs[3]),
+                    int.Parse(cvs[4]), int.Parse(cvs[5]), int.Parse(cvs[6]));
+
+                    GameContent.partyCharacters.AddLast(pc);
+                }
+                else if (saveDataSignifier == EquipmentSaveSignifier)
+                {
+                    GameContent.partyCharacters.Last.Value.equipment.AddLast(int.Parse(cvs[1]));
+                }
+            }
+            sr.Close();
+        }
+        GameContent.RefreshUI();
+    }
+}
+
+
+/* A1 THINGS TO DO
+ * 
  * (DONE) Figure out how to format the data
  * (DONE) Where are we saving the data? - Application.dataPath
  * (DONE) Write data into a text file
@@ -252,7 +394,31 @@ static public class AssignmentPart2
  * (DONE) open file
  * (DONE) read data line by line
  * 
- * A2 THINGS TO DO
+ */
+
+/* A2 THINGS TO DO
  * 
+ * (DONE) Create class that packages file name and an index
+ * (DONE) Save and Load party with dummy file
+ * 
+ * 
+ * (DONE) Write party with file name with given index
+ * (DONE) (file index, party name)
+ * 
+ * (DONE) Declare file name as a constant
+ * 
+ * (DONE) Open the file
+ * 
+ * (DONE) Figue out the line
+ * 
+ * (DONE) Write the index + "," + partyname.txt
+ * 
+ * (DONE) Sequntially create a new index for each new party
+ * (DONE) When new index is created, last used index++ (counter)
+ * (DONE) Save and load last index used (counter)
+ * 
+ * 
+ * (DONE) Save party with file name of the given index
+ * (DONE) Load party with file name of the given index
  * 
  */
